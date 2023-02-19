@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "DOM",
+      "ES6"
+    ],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "esModuleInterop": true
+  },
+}
