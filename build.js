@@ -5,6 +5,7 @@ const files = fs.readdirSync('./src').map(file => `./src/${file}`);
 
 esbuild.build({
   platform    : 'node',
+  format      : 'esm',
   entryPoints : files,
   outdir      : './test',
   packages    : 'external',

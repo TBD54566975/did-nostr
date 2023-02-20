@@ -29,16 +29,21 @@ export class NostrWallet {
     return { mnemonic, wallet };
   }
 
-  getPublickey(idx: number = 0): string {
+  getPrivateKey(idx: number = 0): string {
     const derPath = DER_PATH(idx);
-
     const { privateKey } = this.root.derive(derPath);
 
     if (!privateKey) {
       throw new Error(`failed to derive public key at ${derPath}`);
     }
 
+    return bytesToHex(privateKey);
+  }
+
+  getPublickey(idx: number = 0): string {
+    const privateKey = this.getPrivateKey(idx);
     const publicKey = secp256k1.schnorr.getPublicKey(privateKey);
+
     return bytesToHex(publicKey);
   }
 }
