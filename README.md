@@ -228,4 +228,4 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
 ## Resolving
 >💡 [WIP reference implementation](https://github.com/mistermoe/did-nostr/blob/main/src/did-nostr.ts#L146-L224)
 
->💡 TODO: write out steps to derive base DID Document by reading reference implementation
+>💡 TODO: write out steps to resolve by reading reference implementation
