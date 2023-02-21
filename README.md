@@ -34,7 +34,7 @@ What is a DID document? it's a JSON object that contains information about the D
     {
       "id": "#",
       "type": "NostrRelay",
-      "serviceEndpoint": [" wss://relay.damus.io", "wss://relay.nostr.info"]
+      "serviceEndpoint": ["wss://relay.damus.io", "wss://relay.nostr.info"]
     }
   ],
   "keyAgreement": [
