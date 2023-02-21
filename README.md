@@ -125,6 +125,9 @@ Output
 
 ## DID Event
 
+<img width="1682" alt="image" src="https://user-images.githubusercontent.com/4887440/220267286-f72d70ac-edb9-42f1-bf85-ef012c365ead.png">
+
+
 This event can be used to publish, patch, and recover a DID. every `9325` message should contain the `o` (e.g op) and `d` (e.g. `did`) tags
 ```json
 {
