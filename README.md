@@ -1,6 +1,25 @@
-# `did:nostr`
+# `did:nostr` <!-- omit in toc -->
 
 Thought experiment around bringing dids to nostr. 
+
+- [Why?](#why)
+- [Brain Dump](#brain-dump)
+  - [DIDs](#dids)
+  - [DID Documents](#did-documents)
+- [NIP-9325](#nip-9325)
+  - [DID generation](#did-generation)
+    - [Deriving base DID Document](#deriving-base-did-document)
+  - [DID Event](#did-event)
+    - [`publish`](#publish)
+      - [Event](#event)
+      - [Integrity Checks](#integrity-checks)
+    - [`recover`](#recover)
+      - [Event](#event-1)
+      - [Integrity Checks](#integrity-checks-1)
+    - [`patch`](#patch)
+      - [Event](#event-2)
+  - [Resolving](#resolving)
+
 
 # Why?
 I have no idea whether this will work, or if it's a good idea. What has me interested is:
@@ -32,7 +51,7 @@ What is a DID document? it's a JSON object that contains information about the D
   ],
   "service": [
     {
-      "id": "#",
+      "id": "#nostr",
       "type": "NostrRelay",
       "serviceEndpoint": ["wss://relay.damus.io", "wss://relay.nostr.info"]
     }
@@ -50,7 +69,7 @@ What is a DID document? it's a JSON object that contains information about the D
 
 >_💡 TODO: think of more compelling `service` examples_
 
->_💡 TODO: figure out `id` property for `keyAgreement` and `service`_
+>_💡 TODO: figure out `id` property for `keyAgreement`_
 
 so what do the properties in the DID document mean?
 | property             | description                                                                                      | notes                                                                                                                        |
@@ -62,9 +81,51 @@ so what do the properties in the DID document mean?
 # NIP-9325
 ⚠️ WIP ⚠️
 
-This NIP defines a new event kind `9325` for publishing, patching, and recovering a DID.
+This NIP proposes the following:
+* how to generate a nostr did
+* a new event kind `9325` for publishing, patching, and recovering a DID.
+* how to resolve a nostr DID
 
-every `9325` message should contain the `o` (e.g op) and `d` (e.g. `did`) tags
+
+## DID generation
+`did:nostr:<nip19_npub>`
+
+1. encode public key in accordance to [nip19](https://github.com/nostr-protocol/nips/blob/master/19.md)
+2. prefix the encoded key with `did:nostr:`
+
+>💡 [reference implementation](https://github.com/mistermoe/did-nostr/blob/main/src/did-nostr.ts#L17-L21)
+
+### Deriving base DID Document
+the base DID document can be derived without sending a `publish` message to a relay. It's not all that useful in an of itself, but forms the foundation of DID resolution.
+
+>💡 TODO: write out steps to derive base DID Document by reading reference implementation
+
+>💡 [reference implementation](https://github.com/mistermoe/did-nostr/blob/main/src/did-nostr.ts#L114-L135)
+
+```js
+// from example.ts in reference implementation
+const did = pubKeyToDid(kp.public);
+console.log(deriveDidDoc(did));
+```
+
+Output
+```json
+{
+  "id": "did:nostr:npub1g8nerhn2dahsk0yzpskmz7wqv70zcg52umktjkpukj9nu8ln2jmqfv3rsz",
+  "verificationMethod": [
+    {
+      "id": "#nostr-0",
+      "type": "SchnorrVerificationKey2023",
+      "controller": "did:nostr:npub1g8nerhn2dahsk0yzpskmz7wqv70zcg52umktjkpukj9nu8ln2jmqfv3rsz",
+      "publicKeyHex": "41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6"
+    }
+  ]
+}
+```
+
+## DID Event
+
+This event can be used to publish, patch, and recover a DID. every `9325` message should contain the `o` (e.g op) and `d` (e.g. `did`) tags
 ```json
 {
   "kind": 9325,
@@ -75,33 +136,71 @@ every `9325` message should contain the `o` (e.g op) and `d` (e.g. `did`) tags
 }
 ```
 
-## `publish`
+### `publish`
+
+#### Event
 ```json
 {
-  "content": "{\"r\":\"99b23a194ca1195e5846ad0a1156bd1f8ea943526d90772b3c8a02730f9d5531\"}",
+  "content": "{\"r\":\"683c867bf3dc5e7993fdd0715771d36eb6f00b8a8645795c332246ea5f19c7d5\",\"patches\":[{\"op\":\"add\",\"path\":\"/service\",\"value\":[{\"id\":\"#nostr\",\"type\":\"NostrRelay\",\"serviceEndpoint\":[\"wss://relay.damus.io\"]}]}]}",
+  "created_at": 1676957260,
   "kind": 9325,
-  "pubkey": "8ef849c9575c1ea46710adc49b4ca5a39dab7c358ea05e22e100ce67f751151c",
+  "pubkey": "e3932a8cd4ec81e1e9a41467470ec9db817accf21e1e8b939525e84da6786d9a",
   "tags": [
-    [
-      "d",
-      "nostr:did:npub13muynj2hts02gecs4hzfkn995ww6klp436s9ughpqr8x0a63z5wqmku93m"
-    ],
-    [
-      "o",
-      "publish"
-    ]
-  ]
+    ["d","did:nostr:npub1uwfj4rx5ajq7r6dyz3n5wrkfmwqh4n8jrc0ghyu4yh5ymfncdkdqrr649c"],
+    ["o","publish"]
+  ],
+  "sig": "b1bae7a64d84ce63e40dfa24d299892116694ae71215f357ddad0a0091455e0b985b45ccca6f9354223dc3f0243a9eabcb6d874ff85fac7051493fee8aab2ef9"
 }
 ```
 * should only ever be 1 `publish` event for a given DID
+* should be the first event of kind `9325` for a given DID
+* the `o` tag should have a value of `publish`
+* the `d` tag should be present and contain the relevant DID
 * `content` is a stringified json object that contains the following properties:
 
-| Property | Description                                |
-| -------- | ------------------------------------------ |
-| `r`      | double hashed (sha256) encoded next pubkey |
+| Property  | Description                                                                                                                             |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `r`       | double hashed (sha256) encoded recovery pubkey                                                                                          |
+| `patches` | an array of [JSON patch ops](https://datatracker.ietf.org/doc/html/rfc6902/#section-4) that are applied on top of the base DID Document |
+#### Integrity Checks
+* `nip19.encode(event.pubkey)` should match the `id` of the DID found in the `d` tag.
+* standard nostr `sig` verification
+
+### `recover`
+
+#### Event
+```json
+{
+  "content": "{\"r\":\"0df32bb15f48f60c5d7e035bdfbc67507a8576109a422dd860ad1a7b4935b3e6\"}",
+  "created_at": 1676957711,
+  "kind": 9325,
+  "pubkey": "b424a3e0ea03a1450feef4cdba3dd74892c3e18726f079f89db42d597dfceb4c",
+  "tags": [
+    ["d","did:nostr:npub13x4u4zkm04wm3f95ay9scr4e0hr0822hlsse4qaljf0mn3aagvcspfv3p6"],
+    ["o", "recover"],
+    ["e", "bd513634c49754383d9d4110ebeaa1433467c5b70da7ae2d2873cabcd5445451", "wss://relay.damus.io", "reply"]
+  ],
+  "sig": "1f3fdaf79dcf9fb7ab51834c80b28abc5e6a3850f0185bb5b616f4a5e133f188dc609be10462e551ea984fe403a32a4b0b8b492d0c9c45f63d4fdd4d38d8c46d",
+}
+```
+* the `o` tag should have a value of `publish`
+* the `d` tag should be present and contain the relevant DID
+* should contain a [nip10](https://github.com/nostr-protocol/nips/blob/master/10.md#marked-e-tags-preferred) marked `e` tag pointing to the most recent event of kind `9325` for the relevant DID
+  * _💡 If more than one `e` tag is allowed, it may be helpful to include an additional marked `root` `e` tag that points back to the initial publish event
+  * _💡 If more than one `e` tag is allowed, it may be helpful to include an additional marked `mention` `e` tag that points back to the most recent `recover` event for the relevant DID
+* `content` is a stringified json object that contains the following properties:
+| Property | Description                             |
+| -------- | --------------------------------------- |
+| `r`      | new double hashed (sha256) recovery key |
+
+>_💡 Note: any `r` should not be used more than once. Recovering should always include a new `r` that can be used for subsequent recoveries
+#### Integrity Checks
+* `sha256(sha256(event.pubkey))` should match `JSON.parse(previousEvent.content).r` of the most recent `recover` event if one exists or the initial `publish` event if no other `recover` events exist
 
 
-## `patch`
+### `patch`
+
+#### Event
 ```json
 {
   "kind": 9325,
@@ -120,21 +219,9 @@ every `9325` message should contain the `o` (e.g op) and `d` (e.g. `did`) tags
 | --------- | -------------------------------------------------------------------------------------- |
 | `patches` | an array of [JSON patch ops](https://datatracker.ietf.org/doc/html/rfc6902/#section-4) |
 
-## `recover`
-```json
-{
-  "kind": 9325,
-  "pubkey": "TODO_ADD_PUBKEY_EXAMPLE"
-  "tags": [
-    ["d", "did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh0r04yqk6tcs5"]
-    ["e", "event id of most recent 9325 event for did"]
-    ["o", "recover"],
-  ],
-  "content": "{\"r\":\"TODO_ADD_RECOVERY_KEY_EXAMPLE\"}"
-}
-```
 
-`content` is a stringified json object that contains the following properties:
-| Property | Description                                |
-| -------- | ------------------------------------------ |
-| `r`      | double hashed (sha256) encoded next pubkey |
+
+## Resolving
+>💡 [WIP reference implementation](https://github.com/mistermoe/did-nostr/blob/main/src/did-nostr.ts#L146-L224)
+
+>💡 TODO: write out steps to derive base DID Document by reading reference implementation

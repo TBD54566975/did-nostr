@@ -2,6 +2,7 @@ import {
   createPatchEvent,
   createPublishEvent,
   createRecoverEvent,
+  deriveDidDoc,
   pubKeyToDid,
   resolve
 } from './did-nostr.js';
@@ -27,6 +28,7 @@ const rkp = generateKeyPair();
 const rrkp = generateKeyPair();
 
 const did = pubKeyToDid(kp.public);
+console.log(deriveDidDoc(did));
 
 const publishEvent = createPublishEvent(kp.public, rkp.public, kp.private, ['wss://relay.damus.io']);
 const recoverEvent = createRecoverEvent(
@@ -37,8 +39,10 @@ const recoverEvent = createRecoverEvent(
   rkp.private
 );
 
+console.log(JSON.stringify(recoverEvent, null, 2));
+
 const didDoc = resolve(did, [publishEvent, recoverEvent]);
-console.log(JSON.stringify(didDoc, null, 4));
+// console.log(JSON.stringify(didDoc, null, 4));
 
 // const previousEvent: MarkedEventTag = { eventId: publishEvent.id, relayUrl: '' };
 // const patchEvent = createPatchEvent(did, publicKey, publishEvent.id, [], privateKey);

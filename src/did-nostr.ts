@@ -197,7 +197,6 @@ export function resolve(did: string, events: any[]): any {
     if (op === 'recover') {
       // get r from last recovery event
       const { r: expected } = JSON.parse(previousRecoverEvent.content);
-      console.log(event.pubkey);
 
       // hash revealed recovery key
       const test = hashRecoveryKey(event.pubkey);
