@@ -192,6 +192,7 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
   * _💡 If more than one `e` tag is allowed, it may be helpful to include an additional marked `root` `e` tag that points back to the initial publish event
   * _💡 If more than one `e` tag is allowed, it may be helpful to include an additional marked `mention` `e` tag that points back to the most recent `recover` event for the relevant DID
 * `content` is a stringified json object that contains the following properties:
+
 | Property | Description                             |
 | -------- | --------------------------------------- |
 | `r`      | new double hashed (sha256) recovery key |
