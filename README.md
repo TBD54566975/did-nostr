@@ -25,6 +25,9 @@ Thought experiment around bringing dids to nostr.
 I have no idea whether this will work, or if it's a good idea. What has me interested is:
 * Could provide a means for key rotation while keeping the same pubkey
 * Could allow for interop between different protocols / systems
+* Could enable use of Verifiable Credentials
+  * e.g. CashApp could issue cashtag Verifiable Credentials to DIDs.  This would basically allow people to have a "blue checkmark" or, more generally speaking, some trusted way to say "this pubkey is linked to this cashtag".
+  * e.g. could introduce stuff like payments on nostr via CashApp simply by having a pubkey present their cashtag VC to a CashApp api endpoint. VC can be used as a form of authentication, since the VC was issued by CashApp
 * Could allow for less reliance on DNS if desired
 
 # Brain Dump
@@ -77,6 +80,8 @@ so what do the properties in the DID document mean?
 | `verificationMethod` | includes crypto keys that can be used for various purposes, such as to verify digital signatures | the key shown in the example above happens to be the decoded nostr pubkey                                                    |
 | `service`            | lists services that can be used to interact with a DID                                           | the example includes the nostr relays that this DID publishes to. Could also include any other service e.g. a lightning node |
 | `keyAgreement`       | lists keys that can be used to generate shared keys for encryption/decryption purposes           |                                                                                                                              |
+
+>_💡 there are several other properties that can exist on DID documents. more info on that [here](https://www.w3.org/TR/did-core/)_
 
 # NIP-9325
 ⚠️ WIP ⚠️
