@@ -19,11 +19,12 @@ Thought experiment around bringing dids to nostr.
     - [`patch`](#patch)
       - [Event](#event-2)
   - [Resolving](#resolving)
+- [Considerations](#considerations)
 
 
 # Why?
 I have no idea whether this will work, or if it's a good idea. What has me interested is:
-* Could provide a means for key rotation while keeping the same pubkey
+* Could provide a means for key rotation while using the same pubkey as identity
 * Could allow for interop between different protocols / systems
 * Could enable use of Verifiable Credentials
   * e.g. CashApp could issue cashtag Verifiable Credentials to DIDs.  This would basically allow people to have a "blue checkmark" or, more generally speaking, some trusted way to say "this pubkey is linked to this cashtag".
@@ -75,9 +76,9 @@ What is a DID document? it's a JSON object that contains information about the D
 }
 ```
 
->_💡 TODO: think of more `service` examples_
+>💡 TODO: think of more `service` examples
 
->_💡 TODO: figure out `id` property for `keyAgreement`_
+>💡 TODO: figure out `id` property for `keyAgreement`
 
 so what do the properties in the DID document mean?
 | property             | description                                                                                      | notes                                                                                                                        |
@@ -86,7 +87,7 @@ so what do the properties in the DID document mean?
 | `service`            | lists services that can be used to interact with a DID                                           | the example includes the nostr relays that this DID publishes to. Could also include any other service e.g. a lightning node |
 | `keyAgreement`       | lists keys that can be used to generate shared keys for encryption/decryption purposes           |                                                                                                                              |
 
->_💡 there are several other properties that can exist on DID documents. more info on that [here](https://www.w3.org/TR/did-core/#did-document-properties)_
+>💡 there are several other properties that can exist on DID documents. more info on that [here](https://www.w3.org/TR/did-core/#did-document-properties)
 
 # NIP-9325
 ⚠️ WIP ⚠️
@@ -107,9 +108,9 @@ This NIP proposes the following:
 ### Deriving base DID Document
 the base DID document can be derived without sending a `publish` message to a relay. It's not all that useful in an of itself, but forms the foundation of DID resolution.
 
->💡 TODO: write out steps to derive base DID Document by reading reference implementation
-
 >💡 [reference implementation](https://github.com/mistermoe/did-nostr/blob/main/src/did-nostr.ts#L114-L135)
+
+>💡 TODO: write out steps to derive base DID Document by reading reference implementation
 
 ```js
 // from example.ts in reference implementation
@@ -153,14 +154,14 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
 #### Event
 ```json
 {
-  "content": "{\"r\":\"683c867bf3dc5e7993fdd0715771d36eb6f00b8a8645795c332246ea5f19c7d5\",\"patches\":[{\"op\":\"add\",\"path\":\"/service\",\"value\":[{\"id\":\"#nostr\",\"type\":\"NostrRelay\",\"serviceEndpoint\":[\"wss://relay.damus.io\"]}]}]}",
-  "created_at": 1676957260,
   "kind": 9325,
   "pubkey": "e3932a8cd4ec81e1e9a41467470ec9db817accf21e1e8b939525e84da6786d9a",
+  "created_at": 1676957260,
   "tags": [
     ["d","did:nostr:npub1uwfj4rx5ajq7r6dyz3n5wrkfmwqh4n8jrc0ghyu4yh5ymfncdkdqrr649c"],
     ["o","publish"]
   ],
+  "content": "{\"r\":\"683c867bf3dc5e7993fdd0715771d36eb6f00b8a8645795c332246ea5f19c7d5\",\"patches\":[{\"op\":\"add\",\"path\":\"/service\",\"value\":[{\"id\":\"#nostr\",\"type\":\"NostrRelay\",\"serviceEndpoint\":[\"wss://relay.damus.io\"]}]}]}",
   "sig": "b1bae7a64d84ce63e40dfa24d299892116694ae71215f357ddad0a0091455e0b985b45ccca6f9354223dc3f0243a9eabcb6d874ff85fac7051493fee8aab2ef9"
 }
 ```
@@ -198,15 +199,15 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
 * the `o` tag should have a value of `publish`
 * the `d` tag should be present and contain the relevant DID
 * should contain a [nip10](https://github.com/nostr-protocol/nips/blob/master/10.md#marked-e-tags-preferred) marked `e` tag pointing to the most recent event of kind `9325` for the relevant DID
-  * _💡 If more than one `e` tag is allowed, it may be helpful to include an additional marked `root` `e` tag that points back to the initial publish event
-  * _💡 If more than one `e` tag is allowed, it may be helpful to include an additional marked `mention` `e` tag that points back to the most recent `recover` event for the relevant DID
+  * 💡 If more than one `e` tag is allowed, it may be helpful to include an additional marked `root` `e` tag that points back to the initial publish event
+  * 💡 If more than one `e` tag is allowed, it may be helpful to include an additional marked `mention` `e` tag that points back to the most recent `recover` event for the relevant DID
 * `content` is a stringified json object that contains the following properties:
 
 | Property | Description                             |
 | -------- | --------------------------------------- |
 | `r`      | new double hashed (sha256) recovery key |
 
->_💡 Note: any `r` should not be used more than once. Recovering should always include a new `r` that can be used for subsequent recoveries
+>💡 Note: any `r` should not be used more than once. Recovering should always include a new `r` that can be used for subsequent recoveries
 #### Integrity Checks
 * `sha256(sha256(event.pubkey))` should match `JSON.parse(previousEvent.content).r` of the most recent `recover` event if one exists or the initial `publish` event if no other `recover` events exist
 
@@ -222,7 +223,7 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
     ["e", "event id of most recent 9325 event for did"]
     ["o", "patch"],
   ],
-  "content": "{\"patches\": [TODO_FILL_OUT]}"
+  "content": "{\"patches\":[{\"op\":\"add\",\"path\":\"/service\",\"value\":[{\"id\":\"#nostr\",\"type\":\"NostrRelay\",\"serviceEndpoint\":[\"wss://relay.damus.io\"]}]}]}"
 }
 ```
 
@@ -237,5 +238,20 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
 ## Resolving
 >💡 [WIP reference implementation](https://github.com/mistermoe/did-nostr/blob/main/src/did-nostr.ts#L146-L224)
 
-* Query 
->💡 TODO: write out steps to resolve by reading reference implementation
+---
+
+Given a DID (e.g. `did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh0r04yqk6tcs5`):
+* Derive the base DID document by following [these steps](#deriving-base-did-document)
+* fetch all events of kind `9325` for the DID being resolved
+* order the events using `created_at`
+* ensure that first event is a `publish`. peform integrity checks listed [here](#integrity-checks)
+* for each event thereafter:
+  * ensure that the id provided in the marked event tag matches the id of the previous event
+  * if `publish`: apply patches to DID doc
+  * if `recover`: perform integrity checks listed [here](#integrity-checks-1)
+    * optional: include revealed pubkey as `verificationMethod` in DID doc
+
+
+# Considerations
+* clients or relays making use of the `#d` tag should perform necessary integrity checks before trusting that the event was actually came from the listed DID
+* if possible, relays should perform integrity checks on a `9325` event prior to storing it
