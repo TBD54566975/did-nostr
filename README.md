@@ -57,6 +57,11 @@ What is a DID document? it's a JSON object that contains information about the D
       "id": "#nostr",
       "type": "NostrRelay",
       "serviceEndpoint": ["wss://relay.damus.io", "wss://relay.nostr.info"]
+    },
+    {
+      "id": "#ln",
+      "type": "LightningNode",
+      "serviceEndpoint": "ip://024bfaf0cabe7f874fd33ebf7c6f4e5385971fc504ef3f492432e9e3ec77e1b5cf@52.1.72.207:9735"
     }
   ],
   "keyAgreement": [
@@ -70,7 +75,7 @@ What is a DID document? it's a JSON object that contains information about the D
 }
 ```
 
->_💡 TODO: think of more compelling `service` examples_
+>_💡 TODO: think of more `service` examples_
 
 >_💡 TODO: figure out `id` property for `keyAgreement`_
 
@@ -81,7 +86,7 @@ so what do the properties in the DID document mean?
 | `service`            | lists services that can be used to interact with a DID                                           | the example includes the nostr relays that this DID publishes to. Could also include any other service e.g. a lightning node |
 | `keyAgreement`       | lists keys that can be used to generate shared keys for encryption/decryption purposes           |                                                                                                                              |
 
->_💡 there are several other properties that can exist on DID documents. more info on that [here](https://www.w3.org/TR/did-core/)_
+>_💡 there are several other properties that can exist on DID documents. more info on that [here](https://www.w3.org/TR/did-core/#did-document-properties)_
 
 # NIP-9325
 ⚠️ WIP ⚠️
@@ -90,7 +95,6 @@ This NIP proposes the following:
 * how to generate a nostr did
 * a new event kind `9325` for publishing, patching, and recovering a DID.
 * how to resolve a nostr DID
-
 
 ## DID generation
 `did:nostr:<nip19_npub>`
@@ -233,4 +237,5 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
 ## Resolving
 >💡 [WIP reference implementation](https://github.com/mistermoe/did-nostr/blob/main/src/did-nostr.ts#L146-L224)
 
+* Query 
 >💡 TODO: write out steps to resolve by reading reference implementation

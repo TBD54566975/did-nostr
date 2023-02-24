@@ -1,5 +1,4 @@
 import {
-  createPatchEvent,
   createPublishEvent,
   createRecoverEvent,
   deriveDidDoc,
@@ -40,7 +39,6 @@ const recoverEvent = createRecoverEvent(
 );
 
 console.log(JSON.stringify(recoverEvent, null, 2));
-
 const didDoc = resolve(did, [publishEvent, recoverEvent]);
 // console.log(JSON.stringify(didDoc, null, 4));
 
