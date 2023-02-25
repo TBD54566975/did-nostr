@@ -244,7 +244,7 @@ Given a DID (e.g. `did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh
 * Derive the base DID document by following [these steps](#deriving-base-did-document)
 * fetch all events of kind `9325` for the DID being resolved
 * order the events using `created_at`
-* ensure that first event is a `publish`. peform integrity checks listed [here](#integrity-checks)
+* ensure that first event is a `publish`. perform integrity checks listed [here](#integrity-checks)
 * for each event thereafter:
   * ensure that the id provided in the marked event tag matches the id of the previous event
   * if `publish`: apply patches to DID doc
@@ -253,5 +253,5 @@ Given a DID (e.g. `did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh
 
 
 # Considerations
-* clients or relays making use of the `#d` tag should perform necessary integrity checks before trusting that the event was actually came from the listed DID
+* clients or relays making use of the `#d` tag should perform necessary integrity checks before trusting that the event came from the listed DID
 * if possible, relays should perform integrity checks on a `9325` event prior to storing it
