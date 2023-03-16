@@ -205,7 +205,7 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
   "sig": "1f3fdaf79dcf9fb7ab51834c80b28abc5e6a3850f0185bb5b616f4a5e133f188dc609be10462e551ea984fe403a32a4b0b8b492d0c9c45f63d4fdd4d38d8c46d",
 }
 ```
-* the `o` tag should have a value of `publish`
+* the `o` tag should have a value of `recover`
 * the `d` tag should be present and contain the relevant DID
 * should contain a [nip10](https://github.com/nostr-protocol/nips/blob/master/10.md#marked-e-tags-preferred) marked `e` tag pointing to the most recent event of kind `9325` for the relevant DID
   * 💡 If more than one `e` tag is allowed, it may be helpful to include an additional marked `root` `e` tag that points back to the initial publish event
@@ -256,7 +256,7 @@ Given a DID (e.g. `did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b
 * ensure that first event is a `publish`. perform integrity checks listed [here](#integrity-checks)
 * for each event thereafter:
   * ensure that the id provided in the marked event tag matches the id of the previous event
-  * if `publish`: apply patches to DID doc
+  * if `patch`: apply patches to DID doc
   * if `recover`: perform integrity checks listed [here](#integrity-checks-1)
     * optional: include revealed pubkey as `verificationMethod` in DID doc
 
