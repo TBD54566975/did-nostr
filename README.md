@@ -44,7 +44,10 @@ What is a DID document? it's a JSON object that contains information about the D
 
 ```json
 {
-  "id": "did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh0r04yqk6tcs5",
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
+  "id": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48",
   "verificationMethod": [
     {
       "id": "#nostr-0",
