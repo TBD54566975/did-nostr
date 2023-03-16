@@ -134,7 +134,7 @@ Output
   "verificationMethod": [
     {
       "id": "#nostr-0",
-      "type": "SchnorrVerificationKey2023",
+      "type": "SchnorrSecp256k1VerificationKey2019",
       "controller": "did:nostr:41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6",
       "publicKeyHex": "41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6"
     }
