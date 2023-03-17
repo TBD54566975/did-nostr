@@ -142,6 +142,8 @@ Output
 }
 ```
 
+>💡 the `verificationMethod` in the example above is a schnorr pubkey. [SchnorrSecp256k1VerificationKey2019](https://w3c-ccg.github.io/security-vocab/#SchnorrSecp256k1VerificationKey2019) is used to describe the _type_ of verification method. Honestly not entirely sure what the motiviation is behind including the year (aka `2019`).
+
 ## DID Event
 
 <img width="1682" alt="image" src="https://user-images.githubusercontent.com/4887440/220267286-f72d70ac-edb9-42f1-bf85-ef012c365ead.png">
