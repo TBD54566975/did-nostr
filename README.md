@@ -52,7 +52,7 @@ What is a DID document? it's a JSON object that contains information about the D
   "verificationMethod": [
     {
       "id": "#nostr-0",
-      "type": "SchnorrVerificationKey2023",
+      "type": "SchnorrSecp256k1VerificationKey2019",
       "controller": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48",
       "publicKeyHex": "e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48"
     }
