@@ -1,10 +1,8 @@
-// @ts-ignore
-import nostrTools from 'nostr-tools';
+import { nip19, getEventHash, signEvent, validateEvent, verifySignature } from 'nostr-tools';
 import jp from 'fast-json-patch';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex } from '@noble/hashes/utils';
 
-const { nip19, getEventHash, signEvent, validateEvent, verifySignature } = nostrTools;
 const EVENT_KIND = 9325;
 const OPS = new Set(['publish', 'patch', 'recover']);
 
@@ -15,16 +13,19 @@ export type MarkedEventTag = {
 };
 
 export function pubKeyToDid(pubKey: string): string {
-  const npub = nip19.npubEncode(pubKey);
+  return `did:nostr:${pubKey}`;
+}
 
-  return `did:nostr:${npub}`;
+export function npubEncodeDid(did: string): string {
+  const [_, __, pubkey] = did;
+
+  return `did:nostr:${nip19.npubEncode(pubkey)}`;
 }
 
 export function didToPubKey(did: string): string {
-  const [_, __, npub] = did.split(':');
-  const { data } = nip19.decode(npub);
+  const [_, __, pubkey] = did.split(':');
 
-  return data;
+  return pubkey;
 }
 
 export function hashRecoveryKey(recoveryPubKey: string): string {
@@ -112,7 +113,7 @@ export function getEventOp(event): string {
 }
 
 export function deriveDidDoc(did: string): any {
-  const [protocol, method, npub] = did.split(':');
+  const [protocol, method, pubkey] = did.split(':');
 
   if (protocol !== 'did') {
     throw new Error('invalid DID');
@@ -120,12 +121,6 @@ export function deriveDidDoc(did: string): any {
 
   if (method !== 'nostr') {
     throw new Error(`cannot resolve ${method} DIDs`);
-  }
-
-  const { type, data: pubkey } = nip19.decode(npub);
-
-  if (type !== 'npub') {
-    throw new Error('invalid DID. id must be bech32 encoded');
   }
 
   return {
@@ -137,7 +132,7 @@ export function deriveDidDoc(did: string): any {
 export function createNostrVerificationMethod(did, pubkey): any {
   return {
     'id'           : '#nostr-0',
-    'type'         : 'SchnorrVerificationKey2023',
+    'type'         : 'SchnorrSecp256k1VerificationKey2019',
     'controller'   : did,
     'publicKeyHex' : pubkey
   };

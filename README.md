@@ -8,6 +8,7 @@ Thought experiment around bringing dids to nostr.
   - [DID Documents](#did-documents)
 - [NIP-9325](#nip-9325)
   - [DID generation](#did-generation)
+    - [Example](#example)
     - [Deriving base DID Document](#deriving-base-did-document)
   - [DID Event](#did-event)
     - [`publish`](#publish)
@@ -44,12 +45,15 @@ What is a DID document? it's a JSON object that contains information about the D
 
 ```json
 {
-  "id": "did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh0r04yqk6tcs5",
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
+  "id": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48",
   "verificationMethod": [
     {
       "id": "#nostr-0",
       "type": "SchnorrVerificationKey2023",
-      "controller": "did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh0r04yqk6tcs5",
+      "controller": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48",
       "publicKeyHex": "e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48"
     }
   ],
@@ -69,7 +73,7 @@ What is a DID document? it's a JSON object that contains information about the D
     {
       "id": "#",
       "type": "X25519KeyAgreement2023",
-      "controller": "did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh0r04yqk6tcs5",
+      "controller": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48",
       "publicKeyHex": "75d92cea4ab8ef28a0a14acf103d6b8a2bb026120d62d1817fa5a4b11f534038"
     }
   ]
@@ -98,17 +102,22 @@ This NIP proposes the following:
 * how to resolve a nostr DID
 
 ## DID generation
-`did:nostr:<nip19_npub>`
+`did:nostr:<nostr_hex_pubkey>`
 
-1. encode public key in accordance to [nip19](https://github.com/nostr-protocol/nips/blob/master/19.md)
-2. prefix the encoded key with `did:nostr:`
+1. generate a new (or use an existing) nostr pubkey according to [BIP340](https://bips.xyz/340#public-key-generation) as mentioned in [nip01](https://github.com/nostr-protocol/nips#events-and-signatures). `nostr_hex_pubkey` is represented as 32-bytes lowercase hex-encoded public key
+2. prefix the `nostr_hex_pubkey` with `did:nostr:`
+
+### Example
+`did:nostr:41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6`
 
 >💡 [reference implementation](https://github.com/mistermoe/did-nostr/blob/main/src/did-nostr.ts#L17-L21)
 
-### Deriving base DID Document
-the base DID document can be derived without sending a `publish` message to a relay. It's not all that useful in an of itself, but forms the foundation of DID resolution.
+>💡 if desired nostr dids can be _displayed_ using the bech32 encoded `npub` format described in [nip19](https://github.com/nostr-protocol/nips/blob/master/19.md) e.g. `did:nostr:npub1u2...`. As stated in nip19: The bech32 encodings should _not_ be used to represent a did in nostr events.
 
->💡 [reference implementation](https://github.com/mistermoe/did-nostr/blob/main/src/did-nostr.ts#L114-L135)
+### Deriving base DID Document
+the base DID document can be derived without sending a `publish` message to a relay. It's not all that useful in and of itself, but forms the foundation of DID resolution.
+
+>💡 [reference implementation](https://github.com/tbd54566975/did-nostr/blob/main/src/did-nostr.ts#L114-L135)
 
 >💡 TODO: write out steps to derive base DID Document by reading reference implementation
 
@@ -121,17 +130,19 @@ console.log(deriveDidDoc(did));
 Output
 ```json
 {
-  "id": "did:nostr:npub1g8nerhn2dahsk0yzpskmz7wqv70zcg52umktjkpukj9nu8ln2jmqfv3rsz",
+  "id": "did:nostr:41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6",
   "verificationMethod": [
     {
       "id": "#nostr-0",
-      "type": "SchnorrVerificationKey2023",
-      "controller": "did:nostr:npub1g8nerhn2dahsk0yzpskmz7wqv70zcg52umktjkpukj9nu8ln2jmqfv3rsz",
+      "type": "SchnorrSecp256k1VerificationKey2019",
+      "controller": "did:nostr:41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6",
       "publicKeyHex": "41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6"
     }
   ]
 }
 ```
+
+>💡 the `verificationMethod` in the example above is a schnorr pubkey. [SchnorrSecp256k1VerificationKey2019](https://w3c-ccg.github.io/security-vocab/#SchnorrSecp256k1VerificationKey2019) is used to describe the _type_ of verification method. Honestly not entirely sure what the motiviation is behind including the year (aka `2019`).
 
 ## DID Event
 
@@ -144,7 +155,7 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
   "kind": 9325,
   "tags": [
     ["o", "publish | patch | recover"],
-    ["d", "did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh0r04yqk6tcs5"]
+    ["d", "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48"]
   ]
 }
 ```
@@ -158,7 +169,7 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
   "pubkey": "e3932a8cd4ec81e1e9a41467470ec9db817accf21e1e8b939525e84da6786d9a",
   "created_at": 1676957260,
   "tags": [
-    ["d","did:nostr:npub1uwfj4rx5ajq7r6dyz3n5wrkfmwqh4n8jrc0ghyu4yh5ymfncdkdqrr649c"],
+    ["d","did:nostr:e3932a8cd4ec81e1e9a41467470ec9db817accf21e1e8b939525e84da6786d9a"],
     ["o","publish"]
   ],
   "content": "{\"r\":\"683c867bf3dc5e7993fdd0715771d36eb6f00b8a8645795c332246ea5f19c7d5\",\"patches\":[{\"op\":\"add\",\"path\":\"/service\",\"value\":[{\"id\":\"#nostr\",\"type\":\"NostrRelay\",\"serviceEndpoint\":[\"wss://relay.damus.io\"]}]}]}",
@@ -176,7 +187,7 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
 | `r`       | double hashed (sha256) encoded recovery pubkey                                                                                          |
 | `patches` | an array of [JSON patch ops](https://datatracker.ietf.org/doc/html/rfc6902/#section-4) that are applied on top of the base DID Document |
 #### Integrity Checks
-* `nip19.encode(event.pubkey)` should match the `id` of the DID found in the `d` tag.
+* `event.pubkey` should match the `id` of the DID found in the `d` tag.
 * standard nostr `sig` verification
 
 ### `recover`
@@ -189,14 +200,14 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
   "kind": 9325,
   "pubkey": "b424a3e0ea03a1450feef4cdba3dd74892c3e18726f079f89db42d597dfceb4c",
   "tags": [
-    ["d","did:nostr:npub13x4u4zkm04wm3f95ay9scr4e0hr0822hlsse4qaljf0mn3aagvcspfv3p6"],
+    ["d","did:nostr:89abca8adb7d5db8a4b4e90b0c0eb97dc6f3a957fc219a83bf925fb9c7bd4331"],
     ["o", "recover"],
     ["e", "bd513634c49754383d9d4110ebeaa1433467c5b70da7ae2d2873cabcd5445451", "wss://relay.damus.io", "reply"]
   ],
   "sig": "1f3fdaf79dcf9fb7ab51834c80b28abc5e6a3850f0185bb5b616f4a5e133f188dc609be10462e551ea984fe403a32a4b0b8b492d0c9c45f63d4fdd4d38d8c46d",
 }
 ```
-* the `o` tag should have a value of `publish`
+* the `o` tag should have a value of `recover`
 * the `d` tag should be present and contain the relevant DID
 * should contain a [nip10](https://github.com/nostr-protocol/nips/blob/master/10.md#marked-e-tags-preferred) marked `e` tag pointing to the most recent event of kind `9325` for the relevant DID
   * 💡 If more than one `e` tag is allowed, it may be helpful to include an additional marked `root` `e` tag that points back to the initial publish event
@@ -219,7 +230,7 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
 {
   "kind": 9325,
   "tags": [
-    ["d", "did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh0r04yqk6tcs5"]
+    ["d", "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48"]
     ["e", "event id of most recent 9325 event for did"]
     ["o", "patch"],
   ],
@@ -240,14 +251,14 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
 
 ---
 
-Given a DID (e.g. `did:nostr:npub1u2764y8fdf86lw03cdhekduwfw7kl63xuh28qcl8kv92zh0r04yqk6tcs5`):
+Given a DID (e.g. `did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48`):
 * Derive the base DID document by following [these steps](#deriving-base-did-document)
 * fetch all events of kind `9325` for the DID being resolved
 * order the events using `created_at`
 * ensure that first event is a `publish`. perform integrity checks listed [here](#integrity-checks)
 * for each event thereafter:
   * ensure that the id provided in the marked event tag matches the id of the previous event
-  * if `publish`: apply patches to DID doc
+  * if `patch`: apply patches to DID doc
   * if `recover`: perform integrity checks listed [here](#integrity-checks-1)
     * optional: include revealed pubkey as `verificationMethod` in DID doc
 
