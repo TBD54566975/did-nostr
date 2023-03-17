@@ -6,11 +6,7 @@ import {
   resolve
 } from './did-nostr.js';
 
-import nostrTools from 'nostr-tools';
-
-import type { MarkedEventTag } from './did-nostr.js';
-
-const { generatePrivateKey, getPublicKey } = nostrTools;
+import { generatePrivateKey, getPublicKey } from 'nostr-tools';
 
 function generateKeyPair(): { public: string, private: string } {
   const privateKey = generatePrivateKey();
@@ -39,8 +35,9 @@ const recoverEvent = createRecoverEvent(
 );
 
 console.log(JSON.stringify(recoverEvent, null, 2));
+
 const didDoc = resolve(did, [publishEvent, recoverEvent]);
-// console.log(JSON.stringify(didDoc, null, 4));
+console.log(JSON.stringify(didDoc, null, 4));
 
 // const previousEvent: MarkedEventTag = { eventId: publishEvent.id, relayUrl: '' };
 // const patchEvent = createPatchEvent(did, publicKey, publishEvent.id, [], privateKey);
