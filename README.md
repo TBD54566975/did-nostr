@@ -51,7 +51,7 @@ What is a DID document? it's a JSON object that contains information about the D
   "id": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48",
   "verificationMethod": [
     {
-      "id": "#nostr-0",
+      "id": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48#nip06-0",
       "type": "SchnorrSecp256k1VerificationKey2019",
       "controller": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48",
       "publicKeyHex": "e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48"
@@ -59,19 +59,19 @@ What is a DID document? it's a JSON object that contains information about the D
   ],
   "service": [
     {
-      "id": "#nostr",
+      "id": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48#nostr-relays",
       "type": "NostrRelay",
       "serviceEndpoint": ["wss://relay.damus.io", "wss://relay.nostr.info"]
     },
     {
-      "id": "#ln",
+      "id": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48#ln",
       "type": "LightningNode",
       "serviceEndpoint": "ip://024bfaf0cabe7f874fd33ebf7c6f4e5385971fc504ef3f492432e9e3ec77e1b5cf@52.1.72.207:9735"
     }
   ],
   "keyAgreement": [
     {
-      "id": "#",
+      "id": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48#keyagreement",
       "type": "X25519KeyAgreement2023",
       "controller": "did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48",
       "publicKeyHex": "75d92cea4ab8ef28a0a14acf103d6b8a2bb026120d62d1817fa5a4b11f534038"
@@ -133,7 +133,7 @@ Output
   "id": "did:nostr:41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6",
   "verificationMethod": [
     {
-      "id": "#nostr-0",
+      "id": "did:nostr:41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6#nip06-0",
       "type": "SchnorrSecp256k1VerificationKey2019",
       "controller": "did:nostr:41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6",
       "publicKeyHex": "41e791de6a6f6f0b3c820c2db179c0679e2c228ae6ecb9583cb48b3e1ff354b6"
@@ -172,7 +172,7 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
     ["d","did:nostr:e3932a8cd4ec81e1e9a41467470ec9db817accf21e1e8b939525e84da6786d9a"],
     ["o","publish"]
   ],
-  "content": "{\"r\":\"683c867bf3dc5e7993fdd0715771d36eb6f00b8a8645795c332246ea5f19c7d5\",\"patches\":[{\"op\":\"add\",\"path\":\"/service\",\"value\":[{\"id\":\"#nostr\",\"type\":\"NostrRelay\",\"serviceEndpoint\":[\"wss://relay.damus.io\"]}]}]}",
+  "content": "{\"r\":\"683c867bf3dc5e7993fdd0715771d36eb6f00b8a8645795c332246ea5f19c7d5\",\"patches\":[{\"op\":\"add\",\"path\":\"/service\",\"value\":[{\"id\":\"did:nostr:e3932a8cd4ec81e1e9a41467470ec9db817accf21e1e8b939525e84da6786d9a#nostr-relays\",\"type\":\"NostrRelay\",\"serviceEndpoint\":[\"wss://relay.damus.io\"]}]}]}",
   "sig": "b1bae7a64d84ce63e40dfa24d299892116694ae71215f357ddad0a0091455e0b985b45ccca6f9354223dc3f0243a9eabcb6d874ff85fac7051493fee8aab2ef9"
 }
 ```
@@ -234,7 +234,7 @@ This event can be used to publish, patch, and recover a DID. every `9325` messag
     ["e", "event id of most recent 9325 event for did"]
     ["o", "patch"],
   ],
-  "content": "{\"patches\":[{\"op\":\"add\",\"path\":\"/service\",\"value\":[{\"id\":\"#nostr\",\"type\":\"NostrRelay\",\"serviceEndpoint\":[\"wss://relay.damus.io\"]}]}]}"
+  "content": "{\"patches\":[{\"op\":\"add\",\"path\":\"/service\",\"value\":[{\"id\":\"did:nostr:e2bdaa90e96a4fafb9f1c36f9b378e4bbd6fea26e5d47063e7b30aa15de37d48#nostr-relays\",\"type\":\"NostrRelay\",\"serviceEndpoint\":[\"wss://relay.damus.io\"]}]}]}"
 }
 ```
 
